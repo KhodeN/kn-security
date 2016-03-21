@@ -2,13 +2,19 @@ import { SecurityService } from './$security';
 import { TabEventsService } from './$tabEvents';
 import 'angular';
 import 'ui.router';
+import 'angular-cache';
 
-angular.module('kb-security', ['ui.router'])
+var dependencies = [
+    'ui.router',
+    'permission',
+    'angular-cache'
+];
+angular.module('kb-security', dependencies)
     .config((CacheFactoryProvider: ng.cache.ICacheFactoryProvider) => {
         angular.extend(CacheFactoryProvider.defaults, {
             // maxAge: 15 * 60 * 1000,
             storageMode: 'localStorage'
-        });                                    
+        });
     })
     /* tslint:disable:variable-name */
     .factory('cacheGenerator', (CacheFactory: ng.cache.ICacheFactory) => {
