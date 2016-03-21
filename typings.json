@@ -1,0 +1,13 @@
+{
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "angular": "registry:dt/angular#1.5.0+20160318102130",
+    "angular-cache": "github:khoden/typings/angular-cache/angular-cache.d.ts",
+    "angular-permission": "github:khoden/typings/angular-permission/angular-permission.d.ts",
+    "angular-ui-router": "registry:dt/angular-ui-router#1.1.5+20160317120654",
+    "jquery": "registry:dt/jquery#1.10.0+20160316155526",
+    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts",
+    "lodashExt": "github:khoden/lodashExt/lodashExt.d.ts"
+  }
+}

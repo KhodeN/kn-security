@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "umd",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "dist",
+    "listFiles": false,
+    "target": "ES5"
+  },
+  "exclude": [
+    "bower_components",
+    "node_modules",
+    "typings/main.d.ts",
+    "typings/main"
+  ]
+}
