@@ -4,12 +4,13 @@ import 'angular';
 import 'ui.router';
 import 'angular-cache';
 
+var moduleName = 'kn-security';
 var dependencies = [
     'ui.router',
     'permission',
     'angular-cache'
 ];
-angular.module('kb-security', dependencies)
+angular.module(moduleName, dependencies)
     .config((CacheFactoryProvider: ng.cache.ICacheFactoryProvider) => {
         angular.extend(CacheFactoryProvider.defaults, {
             // maxAge: 15 * 60 * 1000,
@@ -32,3 +33,5 @@ angular.module('kb-security', dependencies)
         $security: SecurityService,
         $tabEvents: TabEventsService
     });
+
+export default moduleName;

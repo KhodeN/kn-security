@@ -3,7 +3,7 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", './$security', './$tabEvents', 'angular', 'ui.router'], factory);
+        define(["require", "exports", './$security', './$tabEvents', 'angular', 'ui.router', 'angular-cache'], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -11,7 +11,14 @@
     var _tabEvents_1 = require('./$tabEvents');
     require('angular');
     require('ui.router');
-    angular.module('kb-security', ['ui.router'])
+    require('angular-cache');
+    var dependencies = [
+        'ui.router',
+        'permission',
+        'angular-cache'
+    ];
+    var moduleName = 'kn-security';
+    angular.module(moduleName, dependencies)
         .config(function (CacheFactoryProvider) {
         angular.extend(CacheFactoryProvider.defaults, {
             storageMode: 'localStorage'
@@ -31,4 +38,6 @@
         $security: _security_1.SecurityService,
         $tabEvents: _tabEvents_1.TabEventsService
     });
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = 'kn-security';
 });
