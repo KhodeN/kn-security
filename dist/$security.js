@@ -10,7 +10,6 @@
     require('lodashExt');
     var SecurityService = (function () {
         function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, acl) {
-            'ngInject';
             this.$rootScope = $rootScope;
             this.$q = $q;
             this.$authApi = $authApi;
@@ -159,6 +158,17 @@
                 _this._doAfterSignout();
             });
         };
+        SecurityService.$inject = [
+            '$rootScope',
+            '$q',
+            '$authApi',
+            'store',
+            'RoleStore',
+            'userGroups',
+            '$state',
+            '$tabEvents',
+            'acl'
+        ];
         return SecurityService;
     }());
     exports.SecurityService = SecurityService;

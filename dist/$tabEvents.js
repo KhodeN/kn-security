@@ -9,7 +9,6 @@
     "use strict";
     var TabEventsService = (function () {
         function TabEventsService($window) {
-            'ngInject';
             var _this = this;
             this.$window = $window;
             this._storageHandlers = {};
@@ -28,6 +27,7 @@
             localStorage.setItem(key, (currentValue + 1).toString());
             return this;
         };
+        TabEventsService.$inject = ['$window'];
         return TabEventsService;
     }());
     exports.TabEventsService = TabEventsService;

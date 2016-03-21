@@ -7,6 +7,18 @@ export class SecurityService implements KN.ISecurityService {
     private _loadUserDeferred: ng.IDeferred<KN.ICurrentUser>;
     private _waitLoginDeferred: ng.IDeferred<KN.ICurrentUser>;
 
+    public static $inject = [
+        '$rootScope',
+        '$q',
+        '$authApi',
+        'store',
+        'RoleStore',
+        'userGroups',
+        '$state',
+        '$tabEvents',
+        'acl'
+    ];
+
     constructor(private $rootScope: KN.IRootScope,
                 private $q: ng.IQService,
                 private $authApi: KN.IAuthApiService,
@@ -18,7 +30,6 @@ export class SecurityService implements KN.ISecurityService {
                 private $state: ng.ui.IStateService,
                 private $tabEvents: KN.ITabEvents,
                 private acl: any) {
-        'ngInject';
         this.$rootScope.hasRole = <any>_.bind(this.hasGroup, this);
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
         this.$rootScope.can = <any>_.bind(this.can, this);

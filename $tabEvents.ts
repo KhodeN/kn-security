@@ -5,8 +5,9 @@ export class TabEventsService implements KN.ITabEvents {
         [key: string]: Array<() => void>;
     };
 
+    public static $inject = ['$window'];
+
     constructor(private $window: ng.IWindowService) {
-        'ngInject';
         this._storageHandlers = {};
         this.$window.addEventListener('storage', (e: StorageEvent) => {
             _.forEach(this._storageHandlers[e.key], h => h());
