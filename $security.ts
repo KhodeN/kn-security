@@ -34,6 +34,10 @@ export class SecurityService implements KN.ISecurityService {
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
         this.$rootScope.can = <any>_.bind(this.can, this);
 
+        $rootScope.$on('$stateChangePermissionDenied', (e, route) => {
+            store.put('lastFailedRoute', _.pick(route, ['name', 'params']));
+        });
+
         this._syncSessionBetweenTabs();
         this._defineRoles();
 
@@ -122,7 +126,6 @@ export class SecurityService implements KN.ISecurityService {
         if ( user ) {
             this.store.put('user', user);
         }
-        this.$state.go('app.home');
     }
 
     private _openLastPage() {
