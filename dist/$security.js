@@ -22,6 +22,9 @@
             this.$rootScope.hasRole = _.bind(this.hasGroup, this);
             this.$rootScope.hasRoles = _.bind(this.hasAnyGroup, this);
             this.$rootScope.can = _.bind(this.can, this);
+            $rootScope.$on('$stateChangePermissionDenied', function (e, route) {
+                store.put('lastFailedRoute', _.pick(route, ['name', 'params']));
+            });
             this._syncSessionBetweenTabs();
             this._defineRoles();
             this._waitLoginDeferred = this.$q.defer();
@@ -99,7 +102,6 @@
             if (user) {
                 this.store.put('user', user);
             }
-            this.$state.go('app.home');
         };
         SecurityService.prototype._openLastPage = function () {
             var route = this.store.get('lastFailedRoute');

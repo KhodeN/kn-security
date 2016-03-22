@@ -21,7 +21,7 @@ export class SecurityService implements KN.ISecurityService {
 
     constructor(private $rootScope: KN.IRootScope,
                 private $q: ng.IQService,
-                private $authApi: KN.IAuthApiService,
+                private $authApi: KN.IAuthApiService<KN.ICurrentUser>,
                 private store: ng.ICacheObject,
                 /* tslint:disable:variable-name */
                 private RoleStore: ng.permission.IRoleStore,
