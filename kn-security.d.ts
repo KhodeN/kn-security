@@ -4,9 +4,9 @@ declare namespace KN {
         rights: string[];
     }
 
-    interface IAuthApiService {
-        getCurrentUser<T extends ICurrentUser>(): ng.IPromise<T>;
-        login<T extends ICurrentUser>(login: string, password: string): ng.IPromise<T>;
+    interface IAuthApiService<T extends ICurrentUser> {
+        getCurrentUser<T>(): ng.IPromise<T>;
+        login<T>(login: string, password: string): ng.IPromise<T>;
         logout(): ng.IPromise<any>;
     }
 
