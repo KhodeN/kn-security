@@ -5,8 +5,8 @@ declare namespace KN {
     }
 
     interface IAuthApiService {
-        getCurrentUser(): ng.IPromise<ICurrentUser>;
-        login(login: string, password: string): ng.IPromise<ICurrentUser>;
+        getCurrentUser<T extends ICurrentUser>(): ng.IPromise<T>;
+        login<T extends ICurrentUser>(login: string, password: string): ng.IPromise<T>;
         logout(): ng.IPromise<any>;
     }
 
