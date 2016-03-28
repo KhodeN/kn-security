@@ -1,0 +1,19 @@
+{
+  "name": "kn-security",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/kn-security.js",
+  "scripts": {
+    "tsc": "tsc -w --pretty"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KhodeN/kn-security.git"
+  },
+  "author": "Artem Berezin <berezin.artem@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KhodeN/kn-security/issues"
+  },
+  "homepage": "https://github.com/KhodeN/kn-security#readme"
+}

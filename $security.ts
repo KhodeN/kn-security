@@ -1,11 +1,24 @@
 /// <reference path="./kn-security.d.ts" />
 
 import 'lodashExt';
+import IAuthApiService = KN.IAuthApiService;
+import ICacheObject = ng.ICacheObject;
+import ICurrentUser = KN.ICurrentUser;
+import IDeferred = ng.IDeferred;
+import IQService = ng.IQService;
+import IRoleStore = ng.permission.IRoleStore;
+import IRootScope = KN.IRootScope;
+import IRoute = KN.IRoute;
+import ISecurityService = KN.ISecurityService;
+import IState = ng.ui.IState;
+import IStatePermissions = ng.permission.IStatePermissions;
+import IStateService = ng.ui.IStateService;
+import ITabEvents = KN.ITabEvents;
 
-export class SecurityService implements KN.ISecurityService {
-    private _currentUser: KN.ICurrentUser;
-    private _loadUserDeferred: ng.IDeferred<KN.ICurrentUser>;
-    private _waitLoginDeferred: ng.IDeferred<KN.ICurrentUser>;
+export class SecurityService implements ISecurityService {
+    private _currentUser: ICurrentUser;
+    private _loadUserDeferred: IDeferred<ICurrentUser>;
+    private _waitLoginDeferred: IDeferred<ICurrentUser>;
 
     public static $inject = [
         '$rootScope',
@@ -16,28 +29,35 @@ export class SecurityService implements KN.ISecurityService {
         'userGroups',
         '$state',
         '$tabEvents',
+        'homeRoute',
+        'loginRoute',
         'acl'
     ];
 
-    constructor(private $rootScope: KN.IRootScope,
-                private $q: ng.IQService,
-                private $authApi: KN.IAuthApiService<KN.ICurrentUser>,
-                private store: ng.ICacheObject,
+    constructor(private $rootScope: IRootScope,
+                private $q: IQService,
+                private $authApi: IAuthApiService<ICurrentUser>,
+                private store: ICacheObject,
                 /* tslint:disable:variable-name */
-                private RoleStore: ng.permission.IRoleStore,
+                private RoleStore: IRoleStore,
                 /* tslint:enable:variable-name */
                 private userGroups: string[],
-                private $state: ng.ui.IStateService,
-                private $tabEvents: KN.ITabEvents,
-                private forceHomeRoute: string,
-                private forceLoginRoute: string,
+                private $state: IStateService,
+                private $tabEvents: ITabEvents,
+                private homeRoute: IRoute,
+                private loginRoute: IRoute,
                 private acl: any) {
         this.$rootScope.hasRole = <any>_.bind(this.hasGroup, this);
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
         this.$rootScope.can = <any>_.bind(this.can, this);
 
-        $rootScope.$on('$stateChangePermissionDenied', (e, route) => {
-            store.put('lastFailedRoute', _.pick(route, ['name', 'params']));
+        $rootScope.$on('$stateChangeSuccess', (e, route, params) => {
+            if ( route.name !== this.loginRoute.name ) {
+                store.put('lastSuccessRoute', {name: route.name, params: params});
+            }
+        });
+        $rootScope.$on('$stateChangePermissionDenied', (e, route, params) => {
+            store.put('lastFailedRoute', {name: route.name, params: params});
         });
 
         this._syncSessionBetweenTabs();
@@ -50,7 +70,7 @@ export class SecurityService implements KN.ISecurityService {
         this._loadUserDeferred = this.$q.defer();
         this.$authApi.getCurrentUser()
             .then(
-                (u: KN.ICurrentUser) => this._setCurrentUser(u),
+                (u: ICurrentUser) => this._setCurrentUser(u),
                 () => this._setCurrentUser(undefined)
             );
     }
@@ -66,10 +86,9 @@ export class SecurityService implements KN.ISecurityService {
     public login(login: string, password: string) {
         this._loadUserDeferred = this.$q.defer();
         return this.$authApi.login(login, password)
-            .then((u: KN.ICurrentUser) => {
+            .then((u: ICurrentUser) => {
                 this._setCurrentUser(u);
                 this.$rootScope.$broadcast('user:signin');
-                this._openLastPage();
                 return u;
             });
     }
@@ -102,7 +121,7 @@ export class SecurityService implements KN.ISecurityService {
             if ( !route ) {
                 return false;
             }
-            let permissions = _.cloneDeep(_.get<ng.permission.IStatePermissions>(route, 'data.permissions'));
+            let permissions = _.cloneDeep(_.get<IStatePermissions>(route, 'data.permissions'));
             if ( !permissions ) {
                 return true;
             }
@@ -119,7 +138,7 @@ export class SecurityService implements KN.ISecurityService {
         });
     }
 
-    private _doAfterSignin(user?: KN.ICurrentUser) {
+    private _doAfterSignin(user?: ICurrentUser) {
         this._loadUserDeferred.resolve(user);
         this._waitLoginDeferred.resolve(user);
         this._loadUserDeferred = this.$q.defer();
@@ -132,12 +151,25 @@ export class SecurityService implements KN.ISecurityService {
     }
 
     private _openLastPage() {
-        let route = this.store.get<ng.ui.IState>('lastFailedRoute');
-        if ( route ) {
-            this.store.remove('lastFailedRoute');
-            this.$state.go(route.name, route.params);
-        } else if ( this.forceHomeRoute ) {
-            this.$state.go(this.forceHomeRoute);
+        let go = (storeKey: string)=> {
+            let route = this.store.get<IState>(storeKey);
+            if ( route ) {
+                this.$state.go(route.name, route.params);
+                return true;
+            }
+            return false;
+        };
+
+        if ( go('lastFailedRoute') ) {
+            return;
+        }
+
+        if ( go('lastSuccessRoute') ) {
+            return;
+        }
+
+        if ( this.homeRoute.force ) {
+            this.$state.go(this.homeRoute.name);
         }
     }
 
@@ -147,12 +179,12 @@ export class SecurityService implements KN.ISecurityService {
         this._loadUserDeferred.reject();
 
         this.store.remove('user');
-        if ( this.forceLoginRoute ) {
-            this.$state.go(this.forceLoginRoute);
+        if ( this.loginRoute.force ) {
+            this.$state.go(this.loginRoute.name);
         }
     }
 
-    private _setCurrentUser(user: KN.ICurrentUser) {
+    private _setCurrentUser(user: ICurrentUser) {
         this._currentUser = user;
         this.$rootScope.user = user;
         if ( user ) {

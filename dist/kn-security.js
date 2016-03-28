@@ -19,8 +19,8 @@
         'angular-cache'
     ];
     angular.module(moduleName, dependencies)
-        .value('forceHomeRoute', 'app.home')
-        .value('forceLoginRoute', 'auth.login')
+        .value('homeRoute', { name: 'app.home', force: false })
+        .value('loginRoute', { name: 'auth.login', force: false })
         .config([
         'CacheFactoryProvider',
         function (CacheFactoryProvider) {

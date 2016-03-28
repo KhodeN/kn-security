@@ -9,7 +9,8 @@
     "use strict";
     require('lodashExt');
     var SecurityService = (function () {
-        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, forceHomeRoute, forceLoginRoute, acl) {
+        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, homeRoute, loginRoute, acl) {
+            var _this = this;
             this.$rootScope = $rootScope;
             this.$q = $q;
             this.$authApi = $authApi;
@@ -18,14 +19,19 @@
             this.userGroups = userGroups;
             this.$state = $state;
             this.$tabEvents = $tabEvents;
-            this.forceHomeRoute = forceHomeRoute;
-            this.forceLoginRoute = forceLoginRoute;
+            this.homeRoute = homeRoute;
+            this.loginRoute = loginRoute;
             this.acl = acl;
             this.$rootScope.hasRole = _.bind(this.hasGroup, this);
             this.$rootScope.hasRoles = _.bind(this.hasAnyGroup, this);
             this.$rootScope.can = _.bind(this.can, this);
-            $rootScope.$on('$stateChangePermissionDenied', function (e, route) {
-                store.put('lastFailedRoute', _.pick(route, ['name', 'params']));
+            $rootScope.$on('$stateChangeSuccess', function (e, route, params) {
+                if (route.name !== _this.loginRoute.name) {
+                    store.put('lastSuccessRoute', { name: route.name, params: params });
+                }
+            });
+            $rootScope.$on('$stateChangePermissionDenied', function (e, route, params) {
+                store.put('lastFailedRoute', { name: route.name, params: params });
             });
             this._syncSessionBetweenTabs();
             this._defineRoles();
@@ -50,7 +56,6 @@
                 .then(function (u) {
                 _this._setCurrentUser(u);
                 _this.$rootScope.$broadcast('user:signin');
-                _this._openLastPage();
                 return u;
             });
         };
@@ -107,13 +112,23 @@
             this._openLastPage();
         };
         SecurityService.prototype._openLastPage = function () {
-            var route = this.store.get('lastFailedRoute');
-            if (route) {
-                this.store.remove('lastFailedRoute');
-                this.$state.go(route.name, route.params);
+            var _this = this;
+            var go = function (storeKey) {
+                var route = _this.store.get(storeKey);
+                if (route) {
+                    _this.$state.go(route.name, route.params);
+                    return true;
+                }
+                return false;
+            };
+            if (go('lastFailedRoute')) {
+                return;
             }
-            else if (this.forceHomeRoute) {
-                this.$state.go(this.forceHomeRoute);
+            if (go('lastSuccessRoute')) {
+                return;
+            }
+            if (this.homeRoute.force) {
+                this.$state.go(this.homeRoute.name);
             }
         };
         SecurityService.prototype._doAfterSignout = function () {
@@ -121,8 +136,8 @@
             this._loadUserDeferred = this.$q.defer();
             this._loadUserDeferred.reject();
             this.store.remove('user');
-            if (this.forceLoginRoute) {
-                this.$state.go(this.forceLoginRoute);
+            if (this.loginRoute.force) {
+                this.$state.go(this.loginRoute.name);
             }
         };
         SecurityService.prototype._setCurrentUser = function (user) {
@@ -174,6 +189,8 @@
             'userGroups',
             '$state',
             '$tabEvents',
+            'homeRoute',
+            'loginRoute',
             'acl'
         ];
         return SecurityService;

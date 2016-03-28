@@ -33,4 +33,9 @@ declare namespace KN {
         on(event: string, cb: () => void): ITabEvents;
         emit(event: string): ITabEvents;
     }
+
+    interface IRoute {
+        name: string;
+        force: boolean;
+    }
 }
