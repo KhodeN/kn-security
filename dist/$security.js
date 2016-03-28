@@ -9,7 +9,7 @@
     "use strict";
     require('lodashExt');
     var SecurityService = (function () {
-        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, acl) {
+        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, forceHomeRoute, forceLoginRoute, acl) {
             this.$rootScope = $rootScope;
             this.$q = $q;
             this.$authApi = $authApi;
@@ -18,6 +18,8 @@
             this.userGroups = userGroups;
             this.$state = $state;
             this.$tabEvents = $tabEvents;
+            this.forceHomeRoute = forceHomeRoute;
+            this.forceLoginRoute = forceLoginRoute;
             this.acl = acl;
             this.$rootScope.hasRole = _.bind(this.hasGroup, this);
             this.$rootScope.hasRoles = _.bind(this.hasAnyGroup, this);
@@ -102,6 +104,7 @@
             if (user) {
                 this.store.put('user', user);
             }
+            this._openLastPage();
         };
         SecurityService.prototype._openLastPage = function () {
             var route = this.store.get('lastFailedRoute');
@@ -109,8 +112,8 @@
                 this.store.remove('lastFailedRoute');
                 this.$state.go(route.name, route.params);
             }
-            else {
-                this.$state.go('app.home');
+            else if (this.forceHomeRoute) {
+                this.$state.go(this.forceHomeRoute);
             }
         };
         SecurityService.prototype._doAfterSignout = function () {
@@ -118,7 +121,9 @@
             this._loadUserDeferred = this.$q.defer();
             this._loadUserDeferred.reject();
             this.store.remove('user');
-            this.$state.go('auth.login');
+            if (this.forceLoginRoute) {
+                this.$state.go(this.forceLoginRoute);
+            }
         };
         SecurityService.prototype._setCurrentUser = function (user) {
             this._currentUser = user;

@@ -29,6 +29,8 @@ export class SecurityService implements KN.ISecurityService {
                 private userGroups: string[],
                 private $state: ng.ui.IStateService,
                 private $tabEvents: KN.ITabEvents,
+                private forceHomeRoute: string,
+                private forceLoginRoute: string,
                 private acl: any) {
         this.$rootScope.hasRole = <any>_.bind(this.hasGroup, this);
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
@@ -126,6 +128,7 @@ export class SecurityService implements KN.ISecurityService {
         if ( user ) {
             this.store.put('user', user);
         }
+        this._openLastPage();
     }
 
     private _openLastPage() {
@@ -133,8 +136,8 @@ export class SecurityService implements KN.ISecurityService {
         if ( route ) {
             this.store.remove('lastFailedRoute');
             this.$state.go(route.name, route.params);
-        } else {
-            this.$state.go('app.home');
+        } else if ( this.forceHomeRoute ) {
+            this.$state.go(this.forceHomeRoute);
         }
     }
 
@@ -144,7 +147,9 @@ export class SecurityService implements KN.ISecurityService {
         this._loadUserDeferred.reject();
 
         this.store.remove('user');
-        this.$state.go('auth.login');
+        if ( this.forceLoginRoute ) {
+            this.$state.go(this.forceLoginRoute);
+        }
     }
 
     private _setCurrentUser(user: KN.ICurrentUser) {
