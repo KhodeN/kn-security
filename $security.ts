@@ -46,15 +46,17 @@ export class SecurityService implements ISecurityService {
                 private $tabEvents: ITabEvents,
                 private homeRoute: IRoute,
                 private loginRoute: IRoute,
+                private logoutRoute: IRoute,
                 private acl: any) {
         this.$rootScope.hasRole = <any>_.bind(this.hasGroup, this);
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
         this.$rootScope.can = <any>_.bind(this.can, this);
 
         $rootScope.$on('$stateChangeSuccess', (e, route, params) => {
-            if ( route.name !== this.loginRoute.name ) {
-                store.put('lastSuccessRoute', {name: route.name, params: params});
+            if ( _.includes([loginRoute.name, logoutRoute.name], route.name) ) {
+                return;
             }
+            store.put('lastSuccessRoute', {name: route.name, params: params});
         });
         $rootScope.$on('$stateChangePermissionDenied', (e, route, params) => {
             store.put('lastFailedRoute', {name: route.name, params: params});

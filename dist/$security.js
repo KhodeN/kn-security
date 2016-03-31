@@ -9,8 +9,7 @@
     "use strict";
     require('lodashExt');
     var SecurityService = (function () {
-        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, homeRoute, loginRoute, acl) {
-            var _this = this;
+        function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, homeRoute, loginRoute, logoutRoute, acl) {
             this.$rootScope = $rootScope;
             this.$q = $q;
             this.$authApi = $authApi;
@@ -21,14 +20,16 @@
             this.$tabEvents = $tabEvents;
             this.homeRoute = homeRoute;
             this.loginRoute = loginRoute;
+            this.logoutRoute = logoutRoute;
             this.acl = acl;
             this.$rootScope.hasRole = _.bind(this.hasGroup, this);
             this.$rootScope.hasRoles = _.bind(this.hasAnyGroup, this);
             this.$rootScope.can = _.bind(this.can, this);
             $rootScope.$on('$stateChangeSuccess', function (e, route, params) {
-                if (route.name !== _this.loginRoute.name) {
-                    store.put('lastSuccessRoute', { name: route.name, params: params });
+                if (_.includes([loginRoute.name, logoutRoute.name], route.name)) {
+                    return;
                 }
+                store.put('lastSuccessRoute', { name: route.name, params: params });
             });
             $rootScope.$on('$stateChangePermissionDenied', function (e, route, params) {
                 store.put('lastFailedRoute', { name: route.name, params: params });

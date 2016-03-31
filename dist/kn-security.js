@@ -21,6 +21,7 @@
     angular.module(moduleName, dependencies)
         .value('homeRoute', { name: 'app.home', force: false })
         .value('loginRoute', { name: 'auth.login', force: false })
+        .value('logoutRoute', { name: 'auth.logout', force: false })
         .config([
         'CacheFactoryProvider',
         function (CacheFactoryProvider) {
