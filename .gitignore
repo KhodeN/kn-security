@@ -49,5 +49,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 /typings/
-/bower_components/
+node_modules
 /.gitignore
