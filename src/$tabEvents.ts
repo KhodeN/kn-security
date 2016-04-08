@@ -1,4 +1,4 @@
-/// <reference path="./kn-security.d.ts" />
+/// <reference path="../kn-security.d.ts" />
 
 export class TabEventsService implements KN.ITabEvents {
     private _storageHandlers: {

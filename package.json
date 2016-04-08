@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/KhodeN/kn-security/issues"
   },
-  "homepage": "https://github.com/KhodeN/kn-security#readme"
+  "homepage": "https://github.com/KhodeN/kn-security#readme",
+  "dependencies": {
+    "angular": "^1.5.3",
+    "angular-cache": "^4.5.0",
+    "angular-permission": "^2.1.2",
+    "angular-ui-router": "^1.0.0-alpha.4",
+    "lodash-ext": "github:khoden/lodashExt"
+  }
 }

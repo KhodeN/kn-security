@@ -1,4 +1,4 @@
-/// <reference path="./kn-security.d.ts" />
+/// <reference path="../kn-security.d.ts" />
 
 import 'lodashExt';
 import IAuthApiService = KN.IAuthApiService;
