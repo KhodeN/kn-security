@@ -2,6 +2,7 @@ import { SecurityService } from './$security';
 import { TabEventsService } from './$tabEvents';
 import 'angular';
 import 'ui.router';
+import 'angular-permission';
 import 'angular-cache';
 
 var moduleName = 'kn-security';

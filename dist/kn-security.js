@@ -3,6 +3,7 @@ var _security_1 = require('./$security');
 var _tabEvents_1 = require('./$tabEvents');
 require('angular');
 require('ui.router');
+require('angular-permission');
 require('angular-cache');
 var moduleName = 'kn-security';
 var dependencies = [
