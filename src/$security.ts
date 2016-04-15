@@ -155,7 +155,7 @@ export class SecurityService implements ISecurityService {
     private _openLastPage() {
         let go = (storeKey: string)=> {
             let route = this.store.get<IState>(storeKey);
-            if ( route ) {
+            if ( route && this.$state.get(route.name) ) {
                 this.$state.go(route.name, route.params);
                 return true;
             }

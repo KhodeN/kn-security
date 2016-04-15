@@ -108,7 +108,7 @@ var SecurityService = (function () {
         var _this = this;
         var go = function (storeKey) {
             var route = _this.store.get(storeKey);
-            if (route) {
+            if (route && _this.$state.get(route.name)) {
                 _this.$state.go(route.name, route.params);
                 return true;
             }

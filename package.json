@@ -1,6 +1,6 @@
 {
   "name": "kn-security",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/kn-security.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "dependencies": {
     "angular": "^1.5.3",
     "angular-cache": "^4.5.0",
-    "angular-permission": "^2.1.2",
+    "angular-permission": "^2.3.4",
     "angular-ui-router": "~0.2.18",
     "lodash-ext": "github:khoden/lodashExt"
   }
