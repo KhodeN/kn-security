@@ -194,6 +194,7 @@ var SecurityService = (function () {
         '$tabEvents',
         'homeRoute',
         'loginRoute',
+        'logoutRoute',
         'acl'
     ];
     return SecurityService;
