@@ -150,6 +150,9 @@ export class SecurityService implements ISecurityService {
     private _go(routeName: string, params?: any) {
         if ( this._isAllowedRoute({name: routeName}) ) {
             this.$state.go(routeName, params);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -169,8 +172,7 @@ export class SecurityService implements ISecurityService {
         let go = (storeKey: string)=> {
             let route = this.store.get<IState>(storeKey);
             if ( route && this.$state.get(route.name) ) {
-                this._go(route.name, route.params);
-                return true;
+                return this._go(route.name, route.params);
             }
             return false;
         };

@@ -102,6 +102,10 @@ var SecurityService = (function () {
     SecurityService.prototype._go = function (routeName, params) {
         if (this._isAllowedRoute({ name: routeName })) {
             this.$state.go(routeName, params);
+            return true;
+        }
+        else {
+            return false;
         }
     };
     SecurityService.prototype._doAfterSignin = function (user) {
@@ -119,8 +123,7 @@ var SecurityService = (function () {
         var go = function (storeKey) {
             var route = _this.store.get(storeKey);
             if (route && _this.$state.get(route.name)) {
-                _this._go(route.name, route.params);
-                return true;
+                return _this._go(route.name, route.params);
             }
             return false;
         };
