@@ -183,7 +183,7 @@ export class SecurityService implements ISecurityService {
         }
 
         if ( this.homeRoute.force ) {
-            this._go(this.homeRoute.name);
+            this.$state.go(this.homeRoute.name);
         }
     }
 

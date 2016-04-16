@@ -131,7 +131,7 @@ var SecurityService = (function () {
             return;
         }
         if (this.homeRoute.force) {
-            this._go(this.homeRoute.name);
+            this.$state.go(this.homeRoute.name);
         }
     };
     SecurityService.prototype._doAfterSignout = function () {
