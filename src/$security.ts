@@ -1,6 +1,6 @@
 /// <reference path="../kn-security.d.ts" />
 
-import 'lodashExt';
+import 'lodash-ext';
 import IAuthApiService = KN.IAuthApiService;
 import ICacheObject = ng.ICacheObject;
 import ICurrentUser = KN.ICurrentUser;
@@ -14,6 +14,7 @@ import IState = ng.ui.IState;
 import IStatePermissions = ng.permission.IStatePermissions;
 import IStateService = ng.ui.IStateService;
 import ITabEvents = KN.ITabEvents;
+import IAngularEvent = angular.IAngularEvent;
 
 export class SecurityService implements ISecurityService {
     private _currentUser: ICurrentUser;
@@ -52,15 +53,15 @@ export class SecurityService implements ISecurityService {
         this.$rootScope.hasRoles = <any>_.bind(this.hasAnyGroup, this);
         this.$rootScope.can = <any>_.bind(this.can, this);
 
-        $rootScope.$on('$stateChangeSuccess', (e, route, params) => {
-            if ( _.includes([loginRoute.name, logoutRoute.name], route.name) ) {
-                return;
-            }
-            store.put('lastSuccessRoute', {name: route.name, params: params});
-        });
-        $rootScope.$on('$stateChangePermissionDenied', (e, route, params) => {
-            store.put('lastFailedRoute', {name: route.name, params: params});
-        });
+        const saveRoute = (storeKey: string) =>
+            (e: IAngularEvent, route: IState, params: any) => {
+                if ( this._isAllowedRoute(route) ) {
+                    store.put(storeKey, {name: route.name, params: params});
+                }
+            };
+
+        $rootScope.$on('$stateChangeSuccess', saveRoute('lastSuccessRoute'));
+        $rootScope.$on('$stateChangePermissionDenied', saveRoute('lastFailedRoute'));
 
         this._syncSessionBetweenTabs();
         this._defineRoles();
@@ -140,6 +141,17 @@ export class SecurityService implements ISecurityService {
         });
     }
 
+    private _isAllowedRoute(route: IState) {
+        var excludeRoutes = [this.loginRoute.name, this.logoutRoute.name];
+        return !_.includes(excludeRoutes, route.name);
+    }
+
+    private _go(routeName: string, params?: any) {
+        if ( this._isAllowedRoute({name: routeName}) ) {
+            this.$state.go(routeName, params);
+        }
+    }
+
     private _doAfterSignin(user?: ICurrentUser) {
         this._loadUserDeferred.resolve(user);
         this._waitLoginDeferred.resolve(user);
@@ -156,7 +168,7 @@ export class SecurityService implements ISecurityService {
         let go = (storeKey: string)=> {
             let route = this.store.get<IState>(storeKey);
             if ( route && this.$state.get(route.name) ) {
-                this.$state.go(route.name, route.params);
+                this._go(route.name, route.params);
                 return true;
             }
             return false;
@@ -171,7 +183,7 @@ export class SecurityService implements ISecurityService {
         }
 
         if ( this.homeRoute.force ) {
-            this.$state.go(this.homeRoute.name);
+            this._go(this.homeRoute.name);
         }
     }
 
@@ -182,7 +194,7 @@ export class SecurityService implements ISecurityService {
 
         this.store.remove('user');
         if ( this.loginRoute.force ) {
-            this.$state.go(this.loginRoute.name);
+            this._go(this.loginRoute.name);
         }
     }
 

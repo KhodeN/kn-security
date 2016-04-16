@@ -1,7 +1,8 @@
 "use strict";
-require('lodashExt');
+require('lodash-ext');
 var SecurityService = (function () {
     function SecurityService($rootScope, $q, $authApi, store, RoleStore, userGroups, $state, $tabEvents, homeRoute, loginRoute, logoutRoute, acl) {
+        var _this = this;
         this.$rootScope = $rootScope;
         this.$q = $q;
         this.$authApi = $authApi;
@@ -17,15 +18,15 @@ var SecurityService = (function () {
         this.$rootScope.hasRole = _.bind(this.hasGroup, this);
         this.$rootScope.hasRoles = _.bind(this.hasAnyGroup, this);
         this.$rootScope.can = _.bind(this.can, this);
-        $rootScope.$on('$stateChangeSuccess', function (e, route, params) {
-            if (_.includes([loginRoute.name, logoutRoute.name], route.name)) {
-                return;
-            }
-            store.put('lastSuccessRoute', { name: route.name, params: params });
-        });
-        $rootScope.$on('$stateChangePermissionDenied', function (e, route, params) {
-            store.put('lastFailedRoute', { name: route.name, params: params });
-        });
+        var saveRoute = function (storeKey) {
+            return function (e, route, params) {
+                if (_this._isAllowedRoute(route)) {
+                    store.put(storeKey, { name: route.name, params: params });
+                }
+            };
+        };
+        $rootScope.$on('$stateChangeSuccess', saveRoute('lastSuccessRoute'));
+        $rootScope.$on('$stateChangePermissionDenied', saveRoute('lastFailedRoute'));
         this._syncSessionBetweenTabs();
         this._defineRoles();
         this._waitLoginDeferred = this.$q.defer();
@@ -94,6 +95,15 @@ var SecurityService = (function () {
                 _.isEmpty(_.intersection(permissions.except, user.groups));
         });
     };
+    SecurityService.prototype._isAllowedRoute = function (route) {
+        var excludeRoutes = [this.loginRoute.name, this.logoutRoute.name];
+        return !_.includes(excludeRoutes, route.name);
+    };
+    SecurityService.prototype._go = function (routeName, params) {
+        if (this._isAllowedRoute({ name: routeName })) {
+            this.$state.go(routeName, params);
+        }
+    };
     SecurityService.prototype._doAfterSignin = function (user) {
         this._loadUserDeferred.resolve(user);
         this._waitLoginDeferred.resolve(user);
@@ -109,7 +119,7 @@ var SecurityService = (function () {
         var go = function (storeKey) {
             var route = _this.store.get(storeKey);
             if (route && _this.$state.get(route.name)) {
-                _this.$state.go(route.name, route.params);
+                _this._go(route.name, route.params);
                 return true;
             }
             return false;
@@ -121,7 +131,7 @@ var SecurityService = (function () {
             return;
         }
         if (this.homeRoute.force) {
-            this.$state.go(this.homeRoute.name);
+            this._go(this.homeRoute.name);
         }
     };
     SecurityService.prototype._doAfterSignout = function () {
@@ -130,7 +140,7 @@ var SecurityService = (function () {
         this._loadUserDeferred.reject();
         this.store.remove('user');
         if (this.loginRoute.force) {
-            this.$state.go(this.loginRoute.name);
+            this._go(this.loginRoute.name);
         }
     };
     SecurityService.prototype._setCurrentUser = function (user) {
