@@ -194,7 +194,7 @@ export class SecurityService implements ISecurityService {
 
         this.store.remove('user');
         if ( this.loginRoute.force ) {
-            this._go(this.loginRoute.name);
+            this.$state.go(this.loginRoute.name);
         }
     }
 

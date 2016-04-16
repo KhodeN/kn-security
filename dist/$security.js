@@ -140,7 +140,7 @@ var SecurityService = (function () {
         this._loadUserDeferred.reject();
         this.store.remove('user');
         if (this.loginRoute.force) {
-            this._go(this.loginRoute.name);
+            this.$state.go(this.loginRoute.name);
         }
     };
     SecurityService.prototype._setCurrentUser = function (user) {
