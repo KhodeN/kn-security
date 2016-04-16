@@ -32,6 +32,7 @@ export class SecurityService implements ISecurityService {
         '$tabEvents',
         'homeRoute',
         'loginRoute',
+        'logoutRoute',
         'acl'
     ];
 
